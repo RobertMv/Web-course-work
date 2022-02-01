@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>AviabooKing</title>
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" /> -->
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<!-- <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet" /> -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+</head>
+<body>
+<div id="headline">
+    <h1>AviabooKing</h1>
+    <h3>Мы поможем Вам забронировать любые авиабилеты!</h3>
+</div>
+    <form name="gameForm" class="clientForm">
+        <input type="hidden" name="id" value="0" />
+        <div class="form-group">
+            <input class="form-control" name="name" type="text" onfocus="(this.type='datetime-local')" onblur="(this.type='text')" placeholder="&nbsp;&nbsp;Дата и время отправления"/>
+        </div><br>
+        <div class="form-group">
+            <input class="form-control" name="category" type="text" onfocus="(this.type='datetime-local')" onblur="(this.type='text')" placeholder="&nbsp;&nbsp;Дата и время прибытия"/>
+        </div><br>
+		<div class="form-group">
+            <input class="form-control" name="descr" placeholder="&nbsp;&nbsp;Цена" autocomplete="off"/>
+        </div><br>
+		<div class="form-group">
+            <input class="form-control" name="age" placeholder="&nbsp;&nbsp;ФИО" autocomplete="off"/>
+        </div><br>
+        <div class="panel-body">
+            <button type="submit" class="adminButton">Сохранить</button>
+            <a id="reset" class="btn btn-sm btn-primary">Отменить</a>
+        </div>
+    </form>
+    <table align="center" class="table">
+        <thead><tr><th>Дата и время отправления</th><th>Дата и время прибытия</th><th>Цена</th><th>ФИО</th><th></th></tr></thead>
+        <tbody>
+        </tbody>
+    </table>
+  
+    <script>
+        function GetGames() {
+            $.ajax({
+                url: "/api/games",
+                type: "GET",
+                contentType: "application/json",
+                success: function (games) {
+                    var rows = "";
+                    $.each(games, function (index, game) {
+                        rows += row(game);
+                    })
+                    $("table tbody").append(rows);
+                 }
+            });
+        }
+        function GetGame(id) {
+            $.ajax({
+                url: "/api/games/"+id,
+                type: "GET",
+                contentType: "application/json",
+                success: function (game) {
+                    var form = document.forms["gameForm"];
+                    form.elements["id"].value = game._id;
+                    form.elements["name"].value = game.name;
+                    form.elements["category"].value = game.category;
+					form.elements["descr"].value = game.descr;
+					form.elements["age"].value = game.age;
+                }
+            });
+        }
+        function CreateGame(gameName, gameCategory, gameDescr, gameAge) {
+            $.ajax({
+                url: "api/games",
+                contentType: "application/json",
+                method: "POST",
+                data: JSON.stringify({
+                    name: gameName,
+                    category: gameCategory,
+					descr: gameDescr,
+					age: gameAge
+                }),
+                success: function (game) {
+                    reset();
+                    $("table tbody").append(row(game));
+                }
+            })
+        }
+        function EditGame(gameId, gameName, gameCategory, gameDescr, gameAge) {
+            $.ajax({
+                url: "api/games",
+                contentType: "application/json",
+                method: "PUT",
+                data: JSON.stringify({
+                    id: gameId,
+                    name: gameName,
+                    category: gameCategory,
+					descr: gameDescr,
+					age: gameAge
+                }),
+                success: function (game) {
+                    reset();
+                    console.log(game);
+                    $("tr[data-rowid='" + game._id + "']").replaceWith(row(game));
+                    location.reload();
+                }
+            })
+        }
+
+        function reset() {
+            var form = document.forms["gameForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+
+        function DeleteGame(id) {
+            $.ajax({
+                url: "api/games/"+id,
+                contentType: "application/json",
+                method: "DELETE",
+                success: function (game) {
+                    console.log(game);
+                    $("tr[data-rowid='" + game._id + "']").remove();
+                    location.reload();
+                }
+            })
+        }
+        var row = function (game) {
+            return "<tr>" +
+                   "<td>" + game.name + "</td> <td>" + game.category + "</td>" +
+				   "<td>" + game.descr + "</td> <td>" + game.age +"</td>"+
+                   "<td><a class='editLink' data-id='" + game._id + "'>Изменить</a> " +
+                    "<a class='removeLink' data-id='" + game._id + "'>Забронировать</a></td></tr>";
+        }
+        $("#reset").click(function (e) {
+  
+            e.preventDefault();
+            reset();
+        })
+
+        $("form").submit(function (e) {
+            e.preventDefault();
+            var id = this.elements["id"].value;
+            var name = this.elements["name"].value;
+            var category = this.elements["category"].value;
+			var descr = this.elements["descr"].value;
+			var age = this.elements["age"].value;
+            if (id == 0)
+                CreateGame(name, category, descr, age);
+            else
+                EditGame(id, name, category, descr, age);
+        });
+
+        $("body").on("click", ".editLink", function () {
+            var id = $(this).data("id");
+            GetGame(id);
+        })
+        $("body").on("click", ".removeLink", function () {
+            var id = $(this).data("id");
+            DeleteGame(id);
+        })
+
+        GetGames();
+    </script>
+</body>
+</html>

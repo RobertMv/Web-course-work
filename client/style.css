@@ -1,0 +1,63 @@
+body{
+  margin: 0;
+  font-family: "Century Gothic";
+}
+#headline{
+  padding: 30px;
+  text-align: center;
+  background: #1d85d5;
+  color: white;
+  font-size: 30px;
+}
+
+.adminButton{
+  color: white;
+  font-size: 16px;
+  padding: 10px;
+  margin-right: 10px;
+  background-color: #ec8722;
+  border: 2px solid #ec8722;
+  border-radius: 8px;
+  box-shadow: 5px 8px 8px rgba(0, 0, 0, 0.36);
+}
+
+.clientForm{
+  text-align: center;
+  padding-bottom: 40px;
+  background: #1d85d5;
+  color: white;
+  font-size: 15px;
+}
+
+input{
+  height: 30px;
+  width: 300px;
+  border: 2px solid #87c8ff;
+  border-radius: 12px;
+}
+
+input:focus{
+  outline: none;
+}
+
+.table {
+  padding: 30px;
+  border-collapse: separate;
+  border-spacing: 30px 15px;
+  font-size: 20px;
+}
+
+.removeLink{
+  color: white;
+  font-size: 16px;
+  padding: 6px;
+  margin-right: 6px;
+  background-color: #1d84d4;
+  border: 2px solid #1d84d4;
+  border-radius: 8px;
+  box-shadow: 5px 8px 8px rgba(0, 0, 0, 0.36);
+}
+
+.editLink{
+  font-size: 16px;
+}
